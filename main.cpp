@@ -73,6 +73,9 @@ public:
     void enqueue(std::function<void()> task) {
         {
             std::unique_lock<std::mutex> lock(mtx);
+            if (stop_) {
+                throw std::runtime_error("Cannot enqueue on stopped ThreadPool");
+            }
             tasks_.push(std::move(task));
         }
         cv.notify_one();
